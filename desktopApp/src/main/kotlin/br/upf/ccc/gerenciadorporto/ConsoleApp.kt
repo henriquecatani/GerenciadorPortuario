@@ -10,8 +10,8 @@ fun main() {
 class ConsoleApp {
 
     private val vagas = mutableListOf(
-        VagaCais(numero = 1, tiposPermitidos = setOf(TipoNavio.PORTA_CONTAINER, TipoNavio.CARGA_GERAL), navio = null),
-        VagaCais(numero = 2, tiposPermitidos = setOf(TipoNavio.GRANELEIRO), navio = null)
+        VagaCais(numero = 1, navio = null),
+        VagaCais(numero = 2, navio = null)
     )
 
     private val setoresPatio = mutableListOf(
@@ -52,6 +52,7 @@ class ConsoleApp {
                 3 -> descarregarNavio()
                 4 -> consultarEstado()
                 5 -> registrarSaidaCarga()
+                6 -> registrarSaidaNavio()
                 0 -> {
                     println("Encerrando aplicação...")
                     break
@@ -70,6 +71,7 @@ class ConsoleApp {
         println("3 - Descarregar navio")
         println("4 - Consultar estado do porto")
         println("5 - Registrar saída de carga")
+        println("6 - Registrar saída de navio")
         println("0 - Sair")
         print("Escolha uma opção: ")
     }
@@ -84,7 +86,6 @@ class ConsoleApp {
         val navio = Navio(
             id = lerTexto("ID navio: "),
             nome = lerTexto("Nome navio: "),
-            categoria = lerTipoNavio(),
             cargas = lerCargasDoNavio(),
             status = StatusNavio.ANCORADO
         )
@@ -136,7 +137,7 @@ class ConsoleApp {
 
         println("\n- Navios registrados: ")
         navios.forEach { navio ->
-            println("${navio.id} - ${navio.nome} | Categoria: ${navio.categoria} | Status: ${navio.status}")
+            println("${navio.id} - ${navio.nome} | Status: ${navio.status}")
         }
     }
 
@@ -152,24 +153,20 @@ class ConsoleApp {
         }
     }
 
-    private fun lerTexto(rotulo: String): String {
-        print("$rotulo: ")
-        return readlnOrNull().orEmpty().trim()
+    private fun registrarSaidaNavio() {
+        println("\nRegistrar Saída de Navio")
+        val navioId = lerTexto("ID do navio:")
+        val sucesso = gerenciador.lberarNavio(navioId)
+
+        if (sucesso)
+            println("Carga removida.")
+        else
+            println("Carga não encontrada.")
     }
 
-    private fun lerTipoNavio(): TipoNavio {
-        println("Tipos disponíveis:")
-        TipoNavio.entries.forEachIndexed { index, tipo ->
-            println("${index + 1} - $tipo")
-        }
-
-        while (true) {
-            val opcao = lerTexto("Escolha o tipo do navio: ").toIntOrNull()
-            if (opcao != null && opcao in 1..TipoNavio.entries.size) {
-                return TipoNavio.entries[opcao - 1]
-            }
-            println("Tipo inválido, tente novamente.")
-        }
+    private fun lerTexto(rotulo: String): String {
+        print(rotulo)
+        return readlnOrNull().orEmpty().trim()
     }
 
     private fun lerCargasDoNavio(): List<Carga> {
@@ -203,13 +200,12 @@ class ConsoleApp {
     private fun lerCargaConteiner(): CargaConteiner {
         return CargaConteiner(
             id = lerTexto("ID carga: "),
-            peso = lerTexto("Peso: ").toDoubleOrNull() ?: 0.0,
-            volume = lerTexto("Volume: ").toDoubleOrNull() ?: 0.0,
+            nome = letTexto("Nome da carga: "),
+            qtdContaineres = lerTexto("Quantidade de Containeres: ").toIntOrNull() ?: 0,
+            tamanho = lerTexto("Tamanho dos containeres (6 ou 12): ").toIntOrNull() ?: 6,
             destinatario = lerTexto("Destinatário: "),
             destino = lerTexto("Destino: "),
             metodoTransporte = lerMetodoTransporte(),
-            tamanho = lerTexto("Tamanho (6 ou 12): ").toIntOrNull() ?: 6,
-            tipo = lerTipoConteiner(),
             diasNoPatio = lerTexto("Dias no pátio: ").toIntOrNull() ?: 0
         )
     }
@@ -217,8 +213,8 @@ class ConsoleApp {
     private fun lerCargaGranel(): CargaGranel {
         return CargaGranel(
             id = lerTexto("ID carga: "),
-            peso = lerTexto("Peso: ").toDoubleOrNull() ?: 0.0,
-            volume = lerTexto("Volume: ").toDoubleOrNull() ?: 0.0,
+            nome = letTexto("Nome da carga: "),
+            volume = lerTexto("Volume (m³): ").toDoubleOrNull() ?: 0.0,
             destinatario = lerTexto("Destinatário: "),
             destino = lerTexto("Destino: "),
             metodoTransporte = lerMetodoTransporte(),

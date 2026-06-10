@@ -1,9 +1,6 @@
 package br.upf.ccc.gerenciadorporto.services
 
-import br.upf.ccc.gerenciadorporto.model.Navio
-import br.upf.ccc.gerenciadorporto.model.SetorPatio
-import br.upf.ccc.gerenciadorporto.model.TipoNavio
-import br.upf.ccc.gerenciadorporto.model.VagaCais
+import br.upf.ccc.gerenciadorporto.model.*
 
 class GerenciadorPortuario(val vagas: List<VagaCais>, val setoresPatio: List<SetorPatio>) {
     private val naviosNoPorto = mutableListOf<Navio>()
@@ -18,9 +15,9 @@ class GerenciadorPortuario(val vagas: List<VagaCais>, val setoresPatio: List<Set
         val navio = naviosNoPorto.find { it.id == navioId } ?: return false
         val vaga = vagas.find { it.numero == numeroVaga } ?: return false
 
-        if ( vaga.ocupada || !vaga.tiposPermitidos.contains(TipoNavio.valueOf(navio.categoria.name)) )
-            return false
+        if (vaga.ocupada) return false
 
+        navio.status = StatusNavio.ATRACADO
         vaga.navio = navio
         return true
     }
@@ -28,7 +25,6 @@ class GerenciadorPortuario(val vagas: List<VagaCais>, val setoresPatio: List<Set
     fun descarregarNavio(navioId: String) {
         val navio = naviosNoPorto.find { it.id == navioId } ?: return
         val vaga = vagas.find { it.navio?.id == navioId } ?: return
-        vaga.navio = null
 
         navio.cargas.forEach { carga ->
             val setor = setoresPatio.find { it.tipoCarga.isInstance(carga) }
@@ -36,6 +32,15 @@ class GerenciadorPortuario(val vagas: List<VagaCais>, val setoresPatio: List<Set
             val tarifa = CalculadoraTarifa.calcularTotal(carga)
             println("Tarifa para carga ${carga.id}: $tarifa")
         }
+    }
+
+    fun liberarNavio(navioId: String): Boolean {
+        val navio: Navio = naviosNoPorto.find { it.id == navioId } ?: return false
+        val vaga = vagas.find { it.navio?.id == navioId } ?: return false
+
+        navio.status = StatusNavio.AUSENTE
+        vaga.navio = null
+        return true
     }
 
     fun registrarSaidaCarga(cargaId: String): Boolean {

@@ -2,10 +2,10 @@ package br.upf.ccc.gerenciadorporto.model
 
 abstract class Carga(
     val id: String,
-    val peso: Double,
-    val volume: Double,
-    val destinatario: String,
+    val nome: String,
     val destino: String,
+    val destinatario: String,
+    val volume: Double,
     val metodoTransporte: MetodoTransporte
 ) {
     abstract fun calcularTarifaBase(): Double
@@ -13,15 +13,18 @@ abstract class Carga(
 
 class CargaConteiner(
     id: String,
-    peso: Double,
-    volume: Double,
-    destinatario: String,
+    nome: String,
     destino: String,
+    destinatario: String,
     metodoTransporte: MetodoTransporte,
     val tamanho: Int, // 6 ou 12 metros
     val tipo: TipoConteiner,
-    val diasNoPatio: Int
-) : Carga(id, peso, volume, destinatario, destino, metodoTransporte) {
+    val diasNoPatio: Int,
+    val qtdContaineres: Int
+) : Carga(id, nome, destino, destinatario, metodoTransporte) {
+    val volume: Double get() = tamanho == 12 ? (30 * qtdContaineres) : (15 * qtdContaineres)
+    // container de 12m -> 30m³
+    // container de 6m -> 15m³
 
     override fun calcularTarifaBase(): Double {
         // base: 6m = 1, 12m = 2
@@ -45,17 +48,17 @@ enum class TipoConteiner { PADRAO, REFRIGERADO, PERIGOSO }
 
 class CargaGranel(
     id: String,
-    peso: Double,
-    volume: Double,
-    destinatario: String,
+    nome: String,
     destino: String,
+    destinatario: String,
     metodoTransporte: MetodoTransporte,
+    val volume: Double,
     val tipoGranel: TipoGranel
-) : Carga(id, peso, volume, destinatario, destino, metodoTransporte) {
+) : Carga(id, nome, destino, destinatario, metodoTransporte) {
 
     override fun calcularTarifaBase(): Double {
-        val taxaPorTonelada = 15.0
-        return peso * taxaPorTonelada
+        val taxaPorMetro = 0.15
+        return volume * taxaPorTonelada
     }
 }
 

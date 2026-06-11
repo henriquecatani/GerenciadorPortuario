@@ -16,4 +16,8 @@ class SetorPatio(val id: String, val nome: String, val capacidadeMaxima: Double,
         }
         return false
     }
+
+    override fun toString(): String {
+        return "SetorPatio(id=$id, nome=$nome, capacidadeMaxima=$capacidadeMaxima, tipoCarga=${tipoCarga.simpleName}, cargasArmazenadas=$cargasArmazenadas, ocupacaoAtual=$ocupacaoAtual, qtdContaineres=$qtdContaineres)"
+    }
 }

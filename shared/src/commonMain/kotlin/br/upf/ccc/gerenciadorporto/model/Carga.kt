@@ -9,6 +9,10 @@ abstract class Carga(
 ) {
     abstract val volume: Double
     abstract fun calcularTarifaBase(): Double
+
+    override fun toString(): String {
+        return "id=$id, nome=$nome, destino=$destino, destinatario=$destinatario, metodoTransporte=$metodoTransporte, volume=$volume"
+    }
 }
 
 class CargaConteiner(
@@ -25,6 +29,10 @@ class CargaConteiner(
     override val volume: Double get() = if (tamanho == 12) 30.0 * qtdContaineres else (15.0 * qtdContaineres)
     // container de 12m -> 30m³
     // container de 6m -> 15m³
+
+    override fun toString(): String {
+        return "id=$id, nome=$nome, destino=$destino, destinatario=$destinatario, metodoTransporte=$metodoTransporte, volume=$volume m³, tamanho=$tamanho m, tipo=$tipo, diasNoPatio=$diasNoPatio, qtdContaineres=$qtdContaineres"
+    }
 
     override fun calcularTarifaBase(): Double {
         // base: 6m = 1, 12m = 2
@@ -65,6 +73,10 @@ class CargaGranel(
 
         val taxaPorMetroCub = 50;
         return volume * taxaPorMetroCub * mult
+    }
+
+    override fun toString(): String {
+        return "id=$id, nome=$nome, destino=$destino, destinatario=$destinatario, metodoTransporte=$metodoTransporte, volume=$volume m³, tipoGranel=$tipoGranel"
     }
 }
 

@@ -95,6 +95,7 @@ class ConsoleApp {
         if (sucesso) {
             navios.add(navio)
             println("Navio registrado.")
+            println(navio)
         } else {
             println("Já existe um navio com esse ID.")
         }
@@ -108,6 +109,8 @@ class ConsoleApp {
         val sucesso = gerenciador.atracarNavio(navioId, numeroVaga)
         if (sucesso) {
             println("Navio atracado.")
+            println(vagas.find { it.numero == numeroVaga })
+            println(navios.find { it.id == navioId })
         } else {
             println("Falha ao atracar o navio.")
         }
@@ -118,28 +121,21 @@ class ConsoleApp {
         val navioId = lerTexto("ID do navio: ")
         gerenciador.descarregarNavio(navioId)
         println("Processo de descarregamento executado.")
+        println(navios.find { it.id == navioId })
     }
 
     private fun consultarEstado() {
         println("\nEstado do Porto")
 
         println("\n- Vagas de cais: ")
-        vagas.forEach { vaga ->
-            val navioAtual = vaga.navio?.nome ?: "Vazia"
-            println("Vaga ${vaga.numero} | Ocupada: ${vaga.ocupada} | Navio: $navioAtual")
-        }
+        vagas.forEach { println(it) }
 
         println("\n- Setores do pátio: ")
-        setoresPatio.forEach { setor ->
-            println(
-                "${setor.nome} | Ocupação: ${setor.ocupacaoAtual}/${setor.capacidadeMaxima} | Cargas: ${setor.cargasArmazenadas.size}"
-            )
-        }
 
+        setoresPatio.forEach { println(it) }
         println("\n- Navios registrados: ")
-        navios.forEach { navio ->
-            println("${navio.id} - ${navio.nome} | Status: ${navio.status}")
-        }
+
+        navios.forEach { println(it) }
     }
 
     private fun registrarSaidaCarga() {
@@ -149,6 +145,7 @@ class ConsoleApp {
 
         if (sucesso) {
             println("Carga removida.")
+            consultarEstado()
         } else {
             println("Carga não encontrada.")
         }
@@ -159,10 +156,11 @@ class ConsoleApp {
         val navioId = lerTexto("ID do navio:")
         val sucesso = gerenciador.liberarNavio(navioId)
 
-        if (sucesso)
+        if (sucesso) {
             println("Navio saiu do porto.")
-        else
-            println("Navio não encontrado.")
+            consultarEstado()
+        }
+        else println("Navio não encontrado.")
     }
 
     private fun lerTexto(rotulo: String): String {
@@ -172,7 +170,7 @@ class ConsoleApp {
 
     private fun lerCargasDoNavio(): List<Carga> {
         val cargas = mutableListOf<Carga>()
-        val quantidade = lerTexto("Quantidade de cargas do navio").toIntOrNull() ?: 0
+        val quantidade = lerTexto("Quantidade de cargas do navio: ").toIntOrNull() ?: 0
 
         repeat(quantidade) { indice ->
             println("\nCarga ${indice + 1}")
@@ -188,7 +186,7 @@ class ConsoleApp {
         println("1 - Contêiner")
         println("2 - Granel")
 
-        val carga = when (lerTexto("Escolha").toIntOrNull()) {
+        val carga = when (lerTexto("Escolha: ").toIntOrNull()) {
             1 -> lerCargaConteiner()
             2 -> lerCargaGranel()
             else -> {

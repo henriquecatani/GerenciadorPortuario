@@ -15,6 +15,7 @@ class GerenciadorPortuario(val vagas: List<VagaCais>, val setoresPatio: List<Set
         val navio = naviosNoPorto.find { it.id == navioId } ?: return false
         val vaga = vagas.find { it.numero == numeroVaga } ?: return false
 
+        if (navio.status == StatusNavio.ATRACADO) return false
         if (vaga.ocupada) return false
 
         navio.status = StatusNavio.ATRACADO
@@ -24,14 +25,13 @@ class GerenciadorPortuario(val vagas: List<VagaCais>, val setoresPatio: List<Set
 
     fun descarregarNavio(navioId: String) {
         val navio = naviosNoPorto.find { it.id == navioId } ?: return
-        val vaga = vagas.find { it.navio?.id == navioId } ?: return
 
         navio.cargas.forEach { carga ->
             val setor = setoresPatio.find { it.tipoCarga.isInstance(carga) }
             setor?.alocarCarga(carga)
-            val tarifa = CalculadoraTarifa.calcularTotal(carga)
-            println("Tarifa para carga ${carga.id}: $tarifa")
         }
+
+        navio.status = StatusNavio.DESCARREGADO
     }
 
     fun liberarNavio(navioId: String): Boolean {

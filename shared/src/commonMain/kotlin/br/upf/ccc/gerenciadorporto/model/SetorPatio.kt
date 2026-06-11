@@ -1,11 +1,17 @@
 package br.upf.ccc.gerenciadorporto.model
 
-class SetorPatio(val id: String, val nome: String, val capacidadeMaxima: Double, val qtdContaineres: Int?, val tipoCarga: Class<out Carga>, val cargasArmazenadas: MutableList<Carga>) {
+import kotlin.reflect.KClass
+
+class SetorPatio(val id: String, val nome: String, val capacidadeMaxima: Double, val tipoCarga: KClass<out Carga>, val cargasArmazenadas: MutableList<Carga>) {
     val ocupacaoAtual: Double get() = cargasArmazenadas.sumOf { it.volume }
+    var qtdContaineres: Int? = null
 
     fun alocarCarga(carga: Carga): Boolean {
-        if (carga.javaClass == tipoCarga && ocupacaoAtual + carga.volume <= capacidadeMaxima) {
+        if (tipoCarga.isInstance(carga) && ocupacaoAtual + carga.volume <= capacidadeMaxima) {
             cargasArmazenadas.add(carga)
+            if (carga is CargaConteiner)
+                qtdContaineres = (qtdContaineres ?: 0) + carga.qtdContaineres
+
             return true
         }
         return false

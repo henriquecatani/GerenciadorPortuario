@@ -1,6 +1,7 @@
 package br.upf.ccc.gerenciadorporto
 import br.upf.ccc.gerenciadorporto.model.*
 import br.upf.ccc.gerenciadorporto.services.*
+import kotlin.reflect.KClass
 
 
 fun main() {
@@ -19,14 +20,14 @@ class ConsoleApp {
             id = "P1",
             nome = "Pátio Conteineres",
             capacidadeMaxima = 100_000.0,
-            tipoCarga = CargaConteiner::class.java,
+            tipoCarga = CargaConteiner::class,
             cargasArmazenadas = mutableListOf()
         ),
         SetorPatio(
             id = "P2",
             nome = "Pátio Granel",
             capacidadeMaxima = 200_000.0,
-            tipoCarga = CargaGranel::class.java,
+            tipoCarga = CargaGranel::class,
             cargasArmazenadas = mutableListOf()
         )
     )
@@ -156,12 +157,12 @@ class ConsoleApp {
     private fun registrarSaidaNavio() {
         println("\nRegistrar Saída de Navio")
         val navioId = lerTexto("ID do navio:")
-        val sucesso = gerenciador.lberarNavio(navioId)
+        val sucesso = gerenciador.liberarNavio(navioId)
 
         if (sucesso)
-            println("Carga removida.")
+            println("Navio saiu do porto.")
         else
-            println("Carga não encontrada.")
+            println("Navio não encontrado.")
     }
 
     private fun lerTexto(rotulo: String): String {
@@ -187,7 +188,7 @@ class ConsoleApp {
         println("1 - Contêiner")
         println("2 - Granel")
 
-        return when (lerTexto("Escolha").toIntOrNull()) {
+        val carga = when (lerTexto("Escolha").toIntOrNull()) {
             1 -> lerCargaConteiner()
             2 -> lerCargaGranel()
             else -> {
@@ -195,25 +196,30 @@ class ConsoleApp {
                 lerCargaConteiner()
             }
         }
+
+        println("Tarifa: ${carga.calcularTarifaBase()} reais")
+
+        return carga
     }
 
     private fun lerCargaConteiner(): CargaConteiner {
         return CargaConteiner(
             id = lerTexto("ID carga: "),
-            nome = letTexto("Nome da carga: "),
+            nome = lerTexto("Nome da carga: "),
             qtdContaineres = lerTexto("Quantidade de Containeres: ").toIntOrNull() ?: 0,
             tamanho = lerTexto("Tamanho dos containeres (6 ou 12): ").toIntOrNull() ?: 6,
             destinatario = lerTexto("Destinatário: "),
             destino = lerTexto("Destino: "),
             metodoTransporte = lerMetodoTransporte(),
-            diasNoPatio = lerTexto("Dias no pátio: ").toIntOrNull() ?: 0
+            diasNoPatio = lerTexto("Dias no pátio: ").toIntOrNull() ?: 0,
+            tipo = lerTipoConteiner()
         )
     }
 
     private fun lerCargaGranel(): CargaGranel {
         return CargaGranel(
             id = lerTexto("ID carga: "),
-            nome = letTexto("Nome da carga: "),
+            nome = lerTexto("Nome da carga: "),
             volume = lerTexto("Volume (m³): ").toDoubleOrNull() ?: 0.0,
             destinatario = lerTexto("Destinatário: "),
             destino = lerTexto("Destino: "),

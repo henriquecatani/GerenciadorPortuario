@@ -37,7 +37,7 @@ class CargaConteiner(
     override fun calcularTarifaBase(): Double {
         // base: 6m = 1, 12m = 2
         val mult = if (tamanho == 12) 2.0 else 1.0
-        val taxaMovimentacaoBase = 500.0 * mult * qtdContaineres
+        val taxaMovimentacaoBase = 200.0 * mult * qtdContaineres
 
         val taxaAdicional = when (tipo) {
             TipoConteiner.REFRIGERADO -> 300.0 * qtdContaineres // energia
@@ -76,7 +76,7 @@ class CargaGranel(
     }
 
     override fun toString(): String {
-        return "id=$id, nome=$nome, destino=$destino, destinatario=$destinatario, metodoTransporte=$metodoTransporte, volume=$volume m³, tipoGranel=$tipoGranel"
+        return "Carga (id=$id, nome=$nome, destino=$destino, destinatario=$destinatario, metodoTransporte=$metodoTransporte, volume=$volume m³, tipoGranel=$tipoGranel)"
     }
 }
 

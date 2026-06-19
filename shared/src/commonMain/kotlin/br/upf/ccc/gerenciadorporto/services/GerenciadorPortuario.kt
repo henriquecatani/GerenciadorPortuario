@@ -23,6 +23,17 @@ class GerenciadorPortuario(val vagas: List<VagaCais>, val setoresPatio: List<Set
         return true
     }
 
+    fun atracarNavio(navioId: String): Boolean {
+        val navio = naviosNoPorto.find { it.id == navioId } ?: return false
+        val vaga = vagas.find { !it.ocupada } ?: return false
+
+        if (navio.status == StatusNavio.ATRACADO) return false
+
+        navio.status = StatusNavio.ATRACADO
+        vaga.navio = navio
+        return true
+    }
+
     fun descarregarNavio(navioId: String) {
         val navio = naviosNoPorto.find { it.id == navioId } ?: return
 
